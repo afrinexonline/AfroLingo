@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AfroLingo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Nunito', 'sans-serif'],
+            },
+            colors: {
+              'afro-bg': '#fdf6e3', // Creamy background
+              'afro-primary': '#58cc02', // Duolingo green equivalent, maybe slightly more earthy? Let's stick to vibrant.
+              'afro-secondary': '#ce82ff',
+              'afro-accent': '#ffc800', // Gold
+              'afro-dark': '#2b2b2b',
+              'afro-terracotta': '#e07a5f',
+              'afro-indigo': '#3d405b',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #fdf6e3;
+        font-family: 'Nunito', sans-serif;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
