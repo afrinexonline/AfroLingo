@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowRight, Globe } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { playSound } from '../services/soundService';
 
 interface WelcomeProps {
@@ -28,14 +28,51 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart, onRequestApiKey, hasKey }) =
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-afro-primary opacity-10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none"></div>
 
       <div className="mb-10 relative z-10">
-        <div className="relative">
-          {/* Sunburst effect behind icon */}
-          <div className="absolute inset-0 bg-afro-gold rounded-full animate-pulse opacity-50 blur-xl scale-125"></div>
-          <div className="w-40 h-40 bg-gradient-to-br from-afro-terracotta to-orange-700 rounded-full flex items-center justify-center shadow-2xl border-4 border-afro-bg relative z-10">
-               <Globe size={80} className="text-white" />
+        <div className="relative group cursor-pointer hover:scale-105 transition-transform duration-500">
+          {/* Sunburst effect behind */}
+          <div className="absolute inset-0 bg-afro-gold rounded-full animate-pulse opacity-40 blur-2xl scale-125"></div>
+          
+          {/* Savanna Scene Container */}
+          <div className="w-64 h-64 bg-gradient-to-b from-yellow-400 via-orange-500 to-red-700 rounded-full flex items-end justify-center shadow-2xl border-[6px] border-afro-bg relative z-10 overflow-hidden isolate">
+               
+               {/* Sun */}
+               <div className="absolute top-8 left-1/2 -translate-x-1/2 w-24 h-24 bg-yellow-200 rounded-full blur-xl opacity-60"></div>
+
+               {/* Background Landscape (Hills) */}
+               <div className="absolute bottom-10 left-0 right-0 h-24 bg-orange-800/40 rounded-[100%] z-10 rotate-3 scale-110"></div>
+               <div className="absolute -bottom-6 left-0 right-0 h-24 bg-green-800 rounded-[50%] z-20"></div>
+
+               {/* Animals */}
+               
+               {/* Giraffe - Left Back */}
+               <div className="absolute bottom-14 -left-2 text-6xl z-10 animate-bounce" style={{ animationDuration: '3s' }}>
+                  🦒
+               </div>
+
+               {/* Zebra - Right Back */}
+               <div className="absolute bottom-14 -right-2 text-5xl z-10 animate-pulse" style={{ animationDuration: '4s' }}>
+                  🦓
+               </div>
+
+               {/* Monkey - Hanging Top Right */}
+               <div className="absolute top-6 right-8 text-4xl z-10 animate-bounce origin-top" style={{ animationDuration: '2.5s' }}>
+                  🐒
+               </div>
+
+               {/* Lion - Center Front (King) */}
+               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-8xl z-30 drop-shadow-xl transform transition-transform hover:scale-110 duration-300">
+                  🦁
+               </div>
+               
+               {/* Birds */}
+               <div className="absolute top-10 left-10 text-xs text-black/50 opacity-60">🕊️</div>
+               <div className="absolute top-14 left-16 text-xs text-black/50 opacity-40">🕊️</div>
+
           </div>
-          <div className="absolute -bottom-4 -right-2 bg-afro-primary w-16 h-16 rounded-full flex items-center justify-center border-4 border-white shadow-lg z-20 rotate-12">
-              <span className="text-3xl">🇳🇬</span>
+          
+          {/* Flag Badge */}
+          <div className="absolute -bottom-2 -right-4 bg-afro-primary w-20 h-20 rounded-full flex items-center justify-center border-4 border-white shadow-lg z-50 rotate-12">
+              <span className="text-4xl">🇳🇬</span>
           </div>
         </div>
       </div>
