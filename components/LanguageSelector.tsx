@@ -40,25 +40,34 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, userState
         <UserProfile userState={userState} />
       </div>
 
-      <h1 className="text-3xl font-extrabold text-afro-indigo mb-2 text-center">
-        What would you like to learn?
-      </h1>
-      <p className="text-gray-500 mb-8 text-center">Select a Nigerian language to start your journey.</p>
+      <div className="text-center mb-8 relative">
+        <h1 className="text-4xl font-extrabold text-afro-indigo mb-2">
+          Choose a Path
+        </h1>
+        <div className="h-1 w-20 bg-afro-terracotta mx-auto rounded-full"></div>
+        <p className="text-gray-600 mt-2 font-medium">Select a Nigerian language to start your journey.</p>
+      </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-3xl mb-12">
         {SUPPORTED_LANGUAGES.map((lang) => (
           <button
             key={lang.id}
             onClick={() => handleLanguageClick(lang)}
-            className="group relative flex items-center p-4 bg-white border-2 border-b-4 border-gray-200 hover:border-afro-primary hover:bg-green-50 rounded-2xl transition-all active:border-b-2 active:translate-y-[2px]"
+            className="kente-strip-bottom group relative flex items-center p-5 bg-white shadow-md hover:shadow-xl rounded-2xl transition-all hover:-translate-y-1"
           >
-            <span className="text-4xl mr-4 group-hover:scale-110 transition-transform">{lang.flag}</span>
-            <div className="text-left">
-              <span className="block font-bold text-lg text-gray-700 group-hover:text-afro-primary">
+            {/* Subtle background texture for card */}
+            <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:8px_8px] opacity-20 rounded-2xl"></div>
+            
+            <div className="w-16 h-16 bg-afro-bg rounded-full flex items-center justify-center text-4xl mr-5 border-2 border-afro-terracotta/20 shadow-inner group-hover:scale-110 transition-transform">
+                {lang.flag}
+            </div>
+            
+            <div className="text-left relative z-10">
+              <span className="block font-bold text-xl text-afro-dark group-hover:text-afro-primary transition-colors">
                 {lang.name}
               </span>
-              <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
-                Greeting: {lang.greeting}
+              <span className="text-xs text-afro-terracotta font-bold uppercase tracking-widest">
+                {lang.greeting}
               </span>
             </div>
           </button>
@@ -67,60 +76,64 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, userState
 
       {/* Difficulty Selection Modal */}
       {selectedLangForSetup && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl relative animate-in slide-in-from-bottom-10 zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-afro-indigo/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl relative animate-in slide-in-from-bottom-10 zoom-in-95 duration-300 border-t-8 border-afro-terracotta">
             <button 
               onClick={closeSetup}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full p-1"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white hover:bg-red-500 rounded-full p-2 transition-colors"
             >
               <X size={20} />
             </button>
             
-            <div className="text-center mb-6">
-              <span className="text-6xl mb-2 block">{selectedLangForSetup.flag}</span>
-              <h2 className="text-2xl font-extrabold text-afro-indigo">
-                {selectedLangForSetup.name} Course
+            <div className="text-center mb-8 mt-2">
+              <div className="w-20 h-20 bg-afro-bg rounded-full flex items-center justify-center text-5xl mx-auto mb-4 border-4 border-white shadow-lg">
+                {selectedLangForSetup.flag}
+              </div>
+              <h2 className="text-3xl font-extrabold text-afro-indigo">
+                {selectedLangForSetup.name}
               </h2>
-              <p className="text-gray-500 text-sm">Select your difficulty level</p>
+              <div className="flex items-center justify-center gap-2 text-afro-terracotta font-bold text-sm uppercase tracking-widest mt-1">
+                 <span>Select Difficulty</span>
+              </div>
             </div>
 
             <div className="space-y-3">
               <button 
                 onClick={() => handleDifficultySelect('Beginner')}
-                className="w-full flex items-center p-4 rounded-xl border-2 border-b-4 border-green-200 bg-green-50 hover:bg-green-100 hover:border-green-300 active:border-b-2 active:translate-y-[2px] transition-all group"
+                className="w-full flex items-center p-4 rounded-xl border-2 border-green-100 bg-green-50 hover:bg-green-100 hover:border-green-400 hover:shadow-md transition-all group"
               >
-                <div className="bg-white p-2 rounded-lg mr-4 shadow-sm group-hover:scale-110 transition-transform">
-                   <Sprout className="text-green-500 w-6 h-6" />
+                <div className="bg-white p-3 rounded-full mr-4 shadow-sm group-hover:scale-110 transition-transform text-green-600">
+                   <Sprout size={24} />
                 </div>
                 <div className="text-left">
-                  <span className="block font-bold text-green-800">Beginner</span>
-                  <span className="text-xs text-green-600">Start from scratch. Basics & Greetings.</span>
+                  <span className="block font-bold text-lg text-green-900">Beginner</span>
+                  <span className="text-xs text-green-700 font-medium">Start from scratch. Basics.</span>
                 </div>
               </button>
 
               <button 
                 onClick={() => handleDifficultySelect('Intermediate')}
-                className="w-full flex items-center p-4 rounded-xl border-2 border-b-4 border-yellow-200 bg-yellow-50 hover:bg-yellow-100 hover:border-yellow-300 active:border-b-2 active:translate-y-[2px] transition-all group"
+                className="w-full flex items-center p-4 rounded-xl border-2 border-yellow-100 bg-yellow-50 hover:bg-yellow-100 hover:border-yellow-400 hover:shadow-md transition-all group"
               >
-                <div className="bg-white p-2 rounded-lg mr-4 shadow-sm group-hover:scale-110 transition-transform">
-                   <TreeDeciduous className="text-yellow-600 w-6 h-6" />
+                <div className="bg-white p-3 rounded-full mr-4 shadow-sm group-hover:scale-110 transition-transform text-yellow-600">
+                   <TreeDeciduous size={24} />
                 </div>
                 <div className="text-left">
-                  <span className="block font-bold text-yellow-800">Intermediate</span>
-                  <span className="text-xs text-yellow-700">Conversational phrases & grammar.</span>
+                  <span className="block font-bold text-lg text-yellow-900">Intermediate</span>
+                  <span className="text-xs text-yellow-700 font-medium">Conversational phrases.</span>
                 </div>
               </button>
 
               <button 
                 onClick={() => handleDifficultySelect('Advanced')}
-                className="w-full flex items-center p-4 rounded-xl border-2 border-b-4 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-300 active:border-b-2 active:translate-y-[2px] transition-all group"
+                className="w-full flex items-center p-4 rounded-xl border-2 border-red-100 bg-red-50 hover:bg-red-100 hover:border-red-400 hover:shadow-md transition-all group"
               >
-                <div className="bg-white p-2 rounded-lg mr-4 shadow-sm group-hover:scale-110 transition-transform">
-                   <MountainSnow className="text-red-500 w-6 h-6" />
+                <div className="bg-white p-3 rounded-full mr-4 shadow-sm group-hover:scale-110 transition-transform text-red-600">
+                   <MountainSnow size={24} />
                 </div>
                 <div className="text-left">
-                  <span className="block font-bold text-red-800">Advanced</span>
-                  <span className="text-xs text-red-600">Complex topics & fluency.</span>
+                  <span className="block font-bold text-lg text-red-900">Advanced</span>
+                  <span className="text-xs text-red-700 font-medium">Complex topics & fluency.</span>
                 </div>
               </button>
             </div>

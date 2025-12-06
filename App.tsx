@@ -75,7 +75,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-afro-bg text-gray-800 font-sans selection:bg-afro-primary selection:text-white">
+    <div className="min-h-screen bg-afro-pattern text-gray-800 font-sans selection:bg-afro-primary selection:text-white">
       {screen === 'welcome' && (
         <Welcome 
             onStart={handleStart} 

@@ -15,12 +15,16 @@
             },
             colors: {
               'afro-bg': '#fdf6e3', // Creamy background
-              'afro-primary': '#58cc02', // Duolingo green equivalent, maybe slightly more earthy? Let's stick to vibrant.
+              'afro-primary': '#58cc02', // Vibrant Green
               'afro-secondary': '#ce82ff',
-              'afro-accent': '#ffc800', // Gold
+              'afro-gold': '#FFD700', // Gold
               'afro-dark': '#2b2b2b',
-              'afro-terracotta': '#e07a5f',
+              'afro-terracotta': '#e07a5f', // Burnt Orange
               'afro-indigo': '#3d405b',
+              'afro-wood': '#8b5a2b',
+            },
+            backgroundImage: {
+              'kente-gradient': 'repeating-linear-gradient(90deg, #009900, #009900 10px, #FFD700 10px, #FFD700 20px, #CC0000 20px, #CC0000 30px, #000000 30px, #000000 40px)',
             }
           }
         }
@@ -30,6 +34,62 @@
       body {
         background-color: #fdf6e3;
         font-family: 'Nunito', sans-serif;
+      }
+
+      /* Subtle Mudcloth-inspired Dot Pattern */
+      .bg-afro-pattern {
+        background-color: #fdf6e3;
+        background-image: 
+          radial-gradient(#e07a5f 0.8px, transparent 0.8px), 
+          radial-gradient(#e07a5f 0.8px, #fdf6e3 0.8px);
+        background-size: 24px 24px;
+        background-position: 0 0, 12px 12px;
+        background-attachment: fixed;
+      }
+
+      /* Kente Strip Accent */
+      .kente-strip-bottom {
+        position: relative;
+        overflow: hidden;
+      }
+      .kente-strip-bottom::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: repeating-linear-gradient(
+          90deg,
+          #009900,
+          #009900 10px,
+          #FFD700 10px,
+          #FFD700 20px,
+          #CC0000 20px,
+          #CC0000 30px,
+          #2b2b2b 30px,
+          #2b2b2b 40px
+        );
+      }
+
+      /* Dashed Tribal Border */
+      .tribal-border {
+        border: 2px dashed #e07a5f;
+      }
+
+      /* Custom scrollbar for better aesthetics */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #fdf6e3; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #e07a5f; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #3d405b; 
       }
     </style>
   <script type="importmap">
