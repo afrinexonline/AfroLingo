@@ -16,6 +16,7 @@ export interface Challenge {
   correctAnswer: string;
   explanation: string;
   englishTranslation: string;
+  isRetry?: boolean; // Indicates if this challenge was added back to the queue
 }
 
 export interface Lesson {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Challenge, Lesson, ImageSize, Language, UserState, DifficultyLevel } from '../types';
 import { generateLessonContent, generateChallengeImage } from '../services/geminiService';
-import { CheckCircle2, XCircle, Heart, Loader2, Settings } from 'lucide-react';
+import { CheckCircle2, XCircle, Heart, Loader2, Settings, RefreshCcw } from 'lucide-react';
 import { playSound } from '../services/soundService';
 import LessonComplete from './LessonComplete';
 
@@ -13,6 +13,25 @@ interface LessonScreenProps {
   updateUser: (newState: UserState) => void;
 }
 
+const BACKGROUND_ANIMALS = [
+  { emoji: '🦁', animation: 'animate-bounce', name: 'Simba' },
+  { emoji: '🐗', animation: 'animate-pulse', name: 'Pumbaa' },
+  { emoji: '🐒', animation: 'animate-bounce', name: 'Rafiki' },
+  { emoji: '🦓', animation: 'animate-pulse', name: 'Zebra' },
+  { emoji: '🦒', animation: 'animate-bounce', name: 'Giraffe' },
+  { emoji: '🐘', animation: 'animate-pulse', name: 'Elephant' },
+];
+
+// Helper to shuffle array (Fisher-Yates)
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
 const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExit, userState, updateUser }) => {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
@@ -22,6 +41,9 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExi
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
+  
+  // Background Animal State
+  const [bgAnimal, setBgAnimal] = useState(BACKGROUND_ANIMALS[0]);
   
   // Lesson Lifecycle
   const [isLessonComplete, setIsLessonComplete] = useState(false);
@@ -47,6 +69,12 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExi
     };
     initLesson();
   }, [language, difficulty, lessonCount]);
+
+  // Rotate Background Animal
+  useEffect(() => {
+    const randomAnimal = BACKGROUND_ANIMALS[Math.floor(Math.random() * BACKGROUND_ANIMALS.length)];
+    setBgAnimal(randomAnimal);
+  }, [currentChallengeIndex, isLessonComplete]);
 
   // Fetch Image when challenge changes
   useEffect(() => {
@@ -91,6 +119,24 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExi
       // Decrease hearts globally
       const newHearts = Math.max(0, userState.hearts - 1);
       updateUser({ ...userState, hearts: newHearts });
+
+      // SRS Logic: Push incorrect question to the end of the queue
+      setLesson((prevLesson) => {
+        if (!prevLesson) return null;
+        
+        // Clone the current challenge
+        const retryChallenge: Challenge = {
+          ...challenge,
+          id: Date.now(), // New ID to ensure uniqueness in keys
+          isRetry: true, // Mark as a review item
+          options: shuffleArray(challenge.options) // Shuffle options so user can't memorize position
+        };
+
+        return {
+          ...prevLesson,
+          challenges: [...prevLesson.challenges, retryChallenge]
+        };
+      });
     }
   };
 
@@ -146,6 +192,11 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExi
   if (isLessonComplete) {
     return (
       <div className="flex flex-col h-screen max-w-lg mx-auto bg-afro-pattern relative border-x-4 border-afro-bg overflow-hidden shadow-2xl rounded-2xl">
+         {/* Background Animal for Completion Screen */}
+         <div className={`absolute -bottom-10 -right-10 text-[10rem] opacity-10 pointer-events-none select-none z-0 ${bgAnimal.animation}`} style={{ animationDuration: '4s' }}>
+            {bgAnimal.emoji}
+         </div>
+         
          <LessonComplete 
             xpGained={15} 
             totalStreak={userState.streak} 
@@ -172,6 +223,7 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExi
   if (!lesson) return <div className="p-10 text-center">Failed to load lesson. <button onClick={handleExit} className="underline text-red-500">Go back</button></div>;
 
   const currentChallenge = lesson.challenges[currentChallengeIndex];
+  // Progress bar calculation based on current index vs total length (which grows on error)
   const progress = ((currentChallengeIndex + (isChecked && isCorrect ? 1 : 0)) / lesson.challenges.length) * 100;
 
   return (
@@ -211,7 +263,7 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExi
       )}
 
       {/* Header */}
-      <div className="p-4 flex items-center gap-4 bg-white shadow-sm z-10">
+      <div className="p-4 flex items-center gap-4 bg-white shadow-sm z-20 relative">
         <button onClick={handleExit} className="text-gray-400 hover:text-red-500 transition-colors">
           <XCircle size={28} />
         </button>
@@ -233,76 +285,109 @@ const LessonScreen: React.FC<LessonScreenProps> = ({ language, difficulty, onExi
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-5 pb-32 bg-slate-50">
-        <div className="mb-2 flex items-center gap-2">
-            <span className="text-[10px] font-black text-white bg-afro-terracotta px-2 py-1 rounded-md uppercase tracking-widest">{difficulty}</span>
-            <span className="text-[10px] font-black text-white bg-afro-indigo px-2 py-1 rounded-md uppercase tracking-widest">{lesson.challenges[currentChallengeIndex].type}</span>
-        </div>
+      <div className="flex-1 overflow-y-auto p-5 pb-32 bg-slate-50 relative overflow-hidden">
         
-        <h2 className="text-2xl font-black text-gray-800 mb-6 leading-tight">
-          {currentChallenge.question}
-        </h2>
-
-        {/* Frame for Image */}
-        <div className="w-full aspect-square max-h-64 mb-8 rounded-xl overflow-hidden bg-afro-bg flex items-center justify-center border-[8px] border-afro-wood shadow-xl relative group">
-          {imageLoading ? (
-            <div className="flex flex-col items-center animate-pulse">
-               <Loader2 className="w-12 h-12 text-afro-terracotta animate-spin mb-3" />
-               <span className="text-xs text-afro-wood font-bold uppercase tracking-wide">Painting...</span>
-            </div>
-          ) : currentImage ? (
-            <img 
-              src={currentImage} 
-              alt="Challenge Visual" 
-              className="w-full h-full object-cover animate-in fade-in duration-500" 
-            />
-          ) : (
-             <span className="text-xs text-gray-400">Image unavailable</span>
-          )}
-          
-          {/* Tag */}
-          <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded font-bold border border-white/20">
-            {imageSize}
-          </div>
+        {/* Animated Background Animal */}
+        <div 
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15rem] opacity-5 pointer-events-none select-none z-0 ${bgAnimal.animation} transition-all duration-1000`}
+          style={{ animationDuration: '3s' }}
+        >
+          {bgAnimal.emoji}
         </div>
 
-        {/* Options */}
-        <div className="grid grid-cols-1 gap-3">
-          {currentChallenge.options.map((option, idx) => {
-            const isSelected = selectedOption === option;
-            const isCorrectOption = option === currentChallenge.correctAnswer;
-            
-            let statusClass = "border-gray-300 bg-white hover:bg-gray-50 border-b-4 active:border-b-2 active:translate-y-[2px] text-gray-700";
-            
-            if (isChecked) {
-              if (isSelected && isCorrectOption) {
-                statusClass = "border-afro-primary bg-green-100 text-green-800 border-b-4";
-              } else if (isSelected && !isCorrectOption) {
-                statusClass = "border-red-500 bg-red-50 text-red-600 border-b-4";
-              } else if (isCorrectOption) {
-                 statusClass = "border-afro-primary bg-green-50 text-green-700 border-b-4"; // Show correct answer
-              } else {
-                 statusClass = "border-gray-200 opacity-50 border-b-4 text-gray-400";
-              }
-            } else if (isSelected) {
-              statusClass = "border-blue-400 bg-blue-50 text-blue-600 border-b-4 active:border-b-2";
-            }
-
-            return (
-              <button
-                key={idx}
-                disabled={isChecked}
-                onClick={() => handleSelectOption(option)}
-                className={`p-4 rounded-2xl text-lg text-left font-bold transition-all shadow-sm ${statusClass}`}
-              >
-                <div className="flex items-center justify-between">
-                  {option}
-                  {isChecked && isSelected && isCorrectOption && <CheckCircle2 className="w-6 h-6 text-green-600" />}
-                  {isChecked && isSelected && !isCorrectOption && <XCircle className="w-6 h-6 text-red-500" />}
+        {/* Challenge Content */}
+        <div className="relative z-10">
+          <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-white bg-afro-terracotta px-2 py-1 rounded-md uppercase tracking-widest">{difficulty}</span>
+                <span className="text-[10px] font-black text-white bg-afro-indigo px-2 py-1 rounded-md uppercase tracking-widest">{lesson.challenges[currentChallengeIndex].type}</span>
+              </div>
+              
+              {/* SRS Indicator */}
+              {currentChallenge.isRetry && (
+                <div className="flex items-center gap-1 text-orange-600 bg-orange-100 px-2 py-1 rounded-full animate-in slide-in-from-right-5 fade-in">
+                  <RefreshCcw size={12} />
+                  <span className="text-[10px] font-bold uppercase tracking-wide">Previous Mistake</span>
                 </div>
-              </button>
-            );
-          })}
+              )}
+          </div>
+          
+          <h2 className="text-2xl font-black text-gray-800 mb-6 leading-tight">
+            {currentChallenge.question}
+          </h2>
+
+          {/* Frame for Image */}
+          <div className="w-full aspect-square max-h-64 mb-8 rounded-xl overflow-hidden bg-afro-bg flex items-center justify-center border-[8px] border-afro-wood shadow-xl relative group">
+            {imageLoading ? (
+               <div className="absolute inset-0 z-10 bg-afro-bg flex flex-col items-center justify-center overflow-hidden">
+                 {/* Sun Rising Animation */}
+                 <div className="relative w-32 h-16 overflow-hidden mb-2">
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-gradient-to-t from-red-600 to-yellow-400 rounded-full animate-[sun-rise_2s_infinite_ease-in-out]"></div>
+                 </div>
+                 <div className="w-40 h-1 bg-afro-wood rounded-full mb-3 relative z-10"></div>
+                 <span className="text-xs font-black text-afro-terracotta uppercase tracking-widest animate-pulse">Weaving Visuals...</span>
+                 <style>{`
+                    @keyframes sun-rise {
+                        0% { transform: translate(-50%, 100%); opacity: 0; }
+                        50% { transform: translate(-50%, 10%); opacity: 1; }
+                        100% { transform: translate(-50%, 10%); opacity: 1; }
+                    }
+                 `}</style>
+               </div>
+            ) : currentImage ? (
+              <img 
+                src={currentImage} 
+                alt="Challenge Visual" 
+                className="w-full h-full object-cover animate-in fade-in duration-500" 
+              />
+            ) : (
+              <span className="text-xs text-gray-400">Image unavailable</span>
+            )}
+            
+            {/* Tag */}
+            <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded font-bold border border-white/20">
+              {imageSize}
+            </div>
+          </div>
+
+          {/* Options */}
+          <div className="grid grid-cols-1 gap-3">
+            {currentChallenge.options.map((option, idx) => {
+              const isSelected = selectedOption === option;
+              const isCorrectOption = option === currentChallenge.correctAnswer;
+              
+              let statusClass = "border-gray-300 bg-white hover:bg-gray-50 border-b-4 active:border-b-2 active:translate-y-[2px] text-gray-700";
+              
+              if (isChecked) {
+                if (isSelected && isCorrectOption) {
+                  statusClass = "border-afro-primary bg-green-100 text-green-800 border-b-4";
+                } else if (isSelected && !isCorrectOption) {
+                  statusClass = "border-red-500 bg-red-50 text-red-600 border-b-4";
+                } else if (isCorrectOption) {
+                  statusClass = "border-afro-primary bg-green-50 text-green-700 border-b-4"; // Show correct answer
+                } else {
+                  statusClass = "border-gray-200 opacity-50 border-b-4 text-gray-400";
+                }
+              } else if (isSelected) {
+                statusClass = "border-blue-400 bg-blue-50 text-blue-600 border-b-4 active:border-b-2";
+              }
+
+              return (
+                <button
+                  key={idx}
+                  disabled={isChecked}
+                  onClick={() => handleSelectOption(option)}
+                  className={`p-4 rounded-2xl text-lg text-left font-bold transition-all shadow-sm ${statusClass}`}
+                >
+                  <div className="flex items-center justify-between">
+                    {option}
+                    {isChecked && isSelected && isCorrectOption && <CheckCircle2 className="w-6 h-6 text-green-600" />}
+                    {isChecked && isSelected && !isCorrectOption && <XCircle className="w-6 h-6 text-red-500" />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

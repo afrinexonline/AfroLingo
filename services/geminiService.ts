@@ -97,6 +97,7 @@ export const generateChallengeImage = async (
   const enhancedPrompt = `${prompt}. Vibrant, cute, flat vector art style, simple background, Duolingo style illustration.`;
 
   try {
+    // Attempt with the Pro model (Nano Banana Pro)
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-image-preview',
       contents: {
@@ -117,7 +118,32 @@ export const generateChallengeImage = async (
     }
     return null;
   } catch (error) {
-    console.error("Image generation failed:", error);
-    return null; 
+    console.warn("Nano Banana Pro failed (likely permission), falling back to Flash Image:", error);
+
+    // Fallback to Flash Image (Nano Banana)
+    // Note: Flash Image does not support imageSize config, so we remove it
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+          parts: [{ text: enhancedPrompt }]
+        },
+        config: {
+          imageConfig: {
+            aspectRatio: "1:1"
+          }
+        }
+      });
+
+      for (const part of response.candidates?.[0]?.content?.parts || []) {
+        if (part.inlineData) {
+          return `data:image/png;base64,${part.inlineData.data}`;
+        }
+      }
+      return null;
+    } catch (fallbackError) {
+      console.error("Fallback image generation failed:", fallbackError);
+      return null;
+    }
   }
 };
